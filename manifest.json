@@ -3,15 +3,6 @@
   "description": "FleetCTRL Automation Library \u2014 on-demand and provisioning scripts for AVD session host management",
   "scripts": [
     {
-      "name": "Post-Deploy BCD Repair",
-      "file": "General/Post-Deploy-BCD-Repair.ps1",
-      "description": "Repairs BCD boot configuration after sysprep on Windows 11 24H2+.",
-      "category": "General",
-      "run_on": "on_provision",
-      "execution_mode": "serial",
-      "timeout_seconds": 120
-    },
-    {
       "name": "Diagnose AVD Agent",
       "file": "Diagnostic/Diagnose-AVD-Agent.ps1",
       "description": "Reads full agent state and returns JSON diagnosis with recommended fix script. Always run this first.",
