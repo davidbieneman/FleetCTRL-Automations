@@ -1,0 +1,438 @@
+{
+  "version": "1.0.0",
+  "description": "FleetCTRL Automation Library \u2014 on-demand and provisioning scripts for AVD session host management",
+  "scripts": [
+    {
+      "name": "Post-Deploy BCD Repair",
+      "file": "General/Post-Deploy-BCD-Repair.ps1",
+      "description": "Repairs BCD boot configuration after sysprep on Windows 11 24H2+.",
+      "category": "General",
+      "run_on": "on_provision",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": "Diagnose AVD Agent",
+      "file": "Diagnostic/Diagnose-AVD-Agent.ps1",
+      "description": "Reads full agent state and returns JSON diagnosis with recommended fix script. Always run this first.",
+      "category": "Diagnostic",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": "Disk Cleanup (Agent Temp)",
+      "file": "Environment/Disk-Cleanup-Agent-Temp.ps1",
+      "description": "Cleans temp files, CBS logs, and WU downloads. Fixes DownloadMsiException (Event ID 3277) caused by insufficient disk space for agent updates.",
+      "category": "Environment",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": ".NET Framework Version Check",
+      "file": "Environment/NET-Framework-Version-Check.ps1",
+      "description": "Checks if .NET 4.7.2+ is installed. MissingMethodException (Event ID 3389) means .NET is too old for agent updates. Diagnostic only.",
+      "category": "Environment",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "Port 443 Connectivity Check",
+      "file": "Environment/Port-443-Connectivity-Check.ps1",
+      "description": "Tests TCP 443 connectivity to AVD broker endpoints. If blocked, agent cannot register or maintain heartbeat (Event 3703).",
+      "category": "Environment",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "Check Pending Reboot (Windows Update)",
+      "file": "Environment/Check-Pending-Reboot-Windows-Update.ps1",
+      "description": "Detects pending reboots from Windows Update, CBS, or component servicing that block AVD agent updates. Reports status only.",
+      "category": "Environment",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "FSLogix: Clear Orphaned Local Profiles",
+      "file": "FSLogix/FSLogix-Clear-Orphaned-Local-Profiles.ps1",
+      "description": "Removes orphaned local user profiles from pooled session hosts. Frees disk eaten by failed FSLogix mounts. ONLY run in drain mode with zero sessions.",
+      "category": "FSLogix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": "FSLogix: Restart Services",
+      "file": "FSLogix/FSLogix-Restart-Services.ps1",
+      "description": "Restarts FSLogix profile container services. Fixes VHD mount failures after service crash or timeout.",
+      "category": "FSLogix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "FSLogix: Cloud Cache Status",
+      "file": "FSLogix-Cloud-Cache/FSLogix-Cloud-Cache-Status.ps1",
+      "description": "Uses Microsoft's native Microsoft.FSLogix module to get real-time Cloud Cache provider health: connection state, heartbeat latency, write queue depth, access mode, and uptime.",
+      "category": "FSLogix: Cloud Cache",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "FSLogix: Cloud Cache Validator",
+      "file": "FSLogix-Cloud-Cache/FSLogix-Cloud-Cache-Validator.ps1",
+      "description": "Parses and validates CCDLocations string syntax (case-sensitive!), tests provider accessibility, checks for VHDLocations/CCDLocations conflicts, and validates supporting settings.",
+      "category": "FSLogix: Cloud Cache",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 60
+    },
+    {
+      "name": "FSLogix: Local Cache Analysis",
+      "file": "FSLogix-Cloud-Cache/FSLogix-Local-Cache-Analysis.ps1",
+      "description": "Inspects local Cloud Cache directory (C:\\ProgramData\\FSLogix\\Cache) for per-user cache sizes, total consumption, free space on cache drive, and replication backlog (.queue/.index file counts).",
+      "category": "FSLogix: Cloud Cache",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "FSLogix: Config Audit",
+      "file": "FSLogix-Config/FSLogix-Config-Audit.ps1",
+      "description": "Full dump of all FSLogix registry configuration including Profile Container, ODFC, Cloud Cache, logging, and GPO policy detection. Returns structured JSON with best-practice flags.",
+      "category": "FSLogix: Config",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "FSLogix: Version & Platform Detection",
+      "file": "FSLogix-Config/FSLogix-Version--Platform-Detection.ps1",
+      "description": "Identifies exact FSLogix version (RTM vs CU1), VDI platform (AVD, W365, Citrix, VMware, RDS), OS type, and PowerShell/Hyper-V module availability.",
+      "category": "FSLogix: Config",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "FSLogix: Health Check",
+      "file": "FSLogix-Health/FSLogix-Health-Check.ps1",
+      "description": "30+ automated checks across services, configuration, Defender exclusions, storage, Cloud Cache, and version awareness. Returns pass/warn/fail per check with remediation guidance.",
+      "category": "FSLogix: Health",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 60
+    },
+    {
+      "name": "FSLogix: Event Log Analyzer",
+      "file": "FSLogix-Health/FSLogix-Event-Log-Analyzer.ps1",
+      "description": "Pulls FSLogix-specific Windows events (Apps, CloudCache logs) with severity classification, key Event ID documentation, and per-user grouping. Configurable time range.",
+      "category": "FSLogix: Health",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "FSLogix: Storage Latency Test",
+      "file": "FSLogix-Health/FSLogix-Storage-Latency-Test.ps1",
+      "description": "Measures read/write latency to all configured VHDLocations paths. Rates as Excellent/Good/Fair/Poor with threshold-based classification.",
+      "category": "FSLogix: Health",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 60
+    },
+    {
+      "name": "FSLogix: OST Migration",
+      "file": "FSLogix-Migration/FSLogix-OST-Migration.ps1",
+      "description": "Migrates Outlook OST/PST data files into FSLogix Office containers. Creates VHDX, copies data, sets permissions. Adapted from Aaron Parker's migration script (MIT). Requires Hyper-V + AD modules.",
+      "category": "FSLogix: Migration",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 900
+    },
+    {
+      "name": "FSLogix: ODFC Audit",
+      "file": "FSLogix-Office-365/FSLogix-ODFC-Audit.ps1",
+      "description": "Full dump of Office Data File Container settings including all Include flags (Outlook, OneDrive, Teams, OneNote, SharePoint), deprecated IncludeSkype detection, and single vs dual container mode.",
+      "category": "FSLogix: Office 365",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "FSLogix: OST/PST Inventory",
+      "file": "FSLogix-Office-365/FSLogix-OSTPST-Inventory.ps1",
+      "description": "Finds Outlook OST/PST data files across user profiles and containers. Reports sizes, locations, and flags oversized files. Identifies whether data is inside ODFC vs profile container vs local disk.",
+      "category": "FSLogix: Office 365",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": "FSLogix: Cross-Platform Readiness",
+      "file": "FSLogix-Portability/FSLogix-Cross-Platform-Readiness.ps1",
+      "description": "Validates that FSLogix config supports profile roaming between AVD and Windows 365 via Cloud Cache. Checks CCDLocations, identity type, naming conventions, and ODFC parity. Returns readiness score.",
+      "category": "FSLogix: Portability",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "FSLogix: VHD-to-CloudCache Prep",
+      "file": "FSLogix-Portability/FSLogix-VHD-to-CloudCache-Prep.ps1",
+      "description": "Pre-flight check before migrating from VHDLocations to Cloud Cache. Validates target CCDLocations string, storage accessibility, existing profile pickup, case-sensitivity gotchas, and version compatibility.",
+      "category": "FSLogix: Portability",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 60
+    },
+    {
+      "name": "FSLogix: Profile Share Inventory",
+      "file": "FSLogix-Profiles/FSLogix-Profile-Share-Inventory.ps1",
+      "description": "Enumerates ALL profile containers on VHDLocations shares \u2014 not just active sessions. Detects identity type (AD DS, Entra ID, Entra Guest), container type, ODFC presence, and stale profiles.",
+      "category": "FSLogix: Profiles",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 180
+    },
+    {
+      "name": "FSLogix: Container Stats",
+      "file": "FSLogix-Profiles/FSLogix-Container-Stats.ps1",
+      "description": "Detailed VHD/VHDX statistics including file size, virtual size, white space reclaimable, format, dynamic/fixed, owner, and attachment status. Requires Hyper-V module.",
+      "category": "FSLogix: Profiles",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 180
+    },
+    {
+      "name": "FSLogix: Profile Cleanup",
+      "file": "FSLogix-Profiles/FSLogix-Profile-Cleanup.ps1",
+      "description": "Removes bloat data (browser caches, Teams cache, temp files, crash dumps) from inside profile containers based on configurable age thresholds. Adapted from Aaron Parker's targets (MIT).",
+      "category": "FSLogix: Profiles",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 300
+    },
+    {
+      "name": "FSLogix: Top Consumers",
+      "file": "FSLogix-Profiles/FSLogix-Top-Consumers.ps1",
+      "description": "Reports the largest profile containers sorted by size with username, SID, identity type, last access date, and growth indicators.",
+      "category": "FSLogix: Profiles",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": "FSLogix: Redirections Generator",
+      "file": "FSLogix-Redirections/FSLogix-Redirections-Generator.ps1",
+      "description": "Generates FSLogix redirections.xml from best-practice templates covering browser caches, Teams (classic + new), new Outlook, OneDrive, Slack, Spotify, and more. Based on Aaron Parker's curated list (MIT).",
+      "category": "FSLogix: Redirections",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "FSLogix: Redirections Audit",
+      "file": "FSLogix-Redirections/FSLogix-Redirections-Audit.ps1",
+      "description": "Reads current redirections.xml, lists all exclusions/inclusions, and compares against best-practice template. Flags missing recommended exclusions for Teams, browser caches, etc.",
+      "category": "FSLogix: Redirections",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "FSLogix: App Masking Viewer",
+      "file": "FSLogix-Redirections/FSLogix-App-Masking-Viewer.ps1",
+      "description": "Lists FSLogix App Masking rules (.fxr) and assignments (.fxa) from the Rules directory. Shows rule type, target path, action, and assignment targets (user, group, process).",
+      "category": "FSLogix: Redirections",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 15
+    },
+    {
+      "name": "FSLogix: Defender Exclusion Fix",
+      "file": "FSLogix-Remediation/FSLogix-Defender-Exclusion-Fix.ps1",
+      "description": "Checks and applies FSLogix best-practice Microsoft Defender exclusions: .vhd/.vhdx/.cim extensions, FSLogix process exclusions, and Apps path exclusion. Reports what was missing and what was applied.",
+      "category": "FSLogix: Remediation",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "FSLogix: VHD Compact",
+      "file": "FSLogix-Remediation/FSLogix-VHD-Compact.ps1",
+      "description": "Compacts dynamic VHD/VHDX files to reclaim unused white space. Checks mount status before compacting. Requires Hyper-V PowerShell module. Reports space saved per container.",
+      "category": "FSLogix: Remediation",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 600
+    },
+    {
+      "name": "FSLogix: VHD Repair",
+      "file": "FSLogix-Remediation/FSLogix-VHD-Repair.ps1",
+      "description": "Scans and repairs corrupted VHD/VHDX file systems using Repair-Volume. Mounts read-only for scan, unmounts for offline repair if issues found. Requires Hyper-V module.",
+      "category": "FSLogix: Remediation",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 600
+    },
+    {
+      "name": "FSLogix: Profile Reset",
+      "file": "FSLogix-Remediation/FSLogix-Profile-Reset.ps1",
+      "description": "Backs up (renames) a user's profile container and deletes it so they get a fresh profile on next sign-in. Verifies user is not currently logged in. Returns backup path for potential restoration.",
+      "category": "FSLogix: Remediation",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "Reinstall AVD Agent (Full)",
+      "file": "Install--Reinstall/Reinstall-AVD-Agent-Full.ps1",
+      "description": "Complete uninstall and reinstall of AVD agent + bootloader. Requires reboot. Use when agent is corrupted or wrong version. FleetCTRL passes RegistrationToken as argument.",
+      "category": "Install / Reinstall",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 300
+    },
+    {
+      "name": "Install AVD Agent (Fresh)",
+      "file": "Install--Reinstall/Install-AVD-Agent-Fresh.ps1",
+      "description": "Installs AVD agent from scratch on a VM with no agent. Requires reboot. Use diagnose_agent first to confirm agent is truly missing.",
+      "category": "Install / Reinstall",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 300
+    },
+    {
+      "name": "Collect AVD Diagnostic Logs",
+      "file": "Log-Collection/Collect-AVD-Diagnostic-Logs.ps1",
+      "description": "Gathers AVD agent logs, event log entries, and service state into a single JSON bundle for support troubleshooting.",
+      "category": "Log Collection",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": "Install-WindowsUpdates",
+      "file": "Maintenance/Install-WindowsUpdates.ps1",
+      "description": "Installs available Windows updates via the Windows Update COM API",
+      "category": "Maintenance",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 3600
+    },
+    {
+      "name": "Install-M365Updates",
+      "file": "Maintenance/Install-M365Updates.ps1",
+      "description": "Triggers Microsoft 365 / Office Click-to-Run update",
+      "category": "Maintenance",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 1800
+    },
+    {
+      "name": "Update-DefenderSignatures",
+      "file": "Maintenance/Update-DefenderSignatures.ps1",
+      "description": "Updates Windows Defender antivirus signatures via MpCmdRun.exe",
+      "category": "Maintenance",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 600
+    },
+    {
+      "name": "Send-LogoffWarning",
+      "file": "Maintenance/Send-LogoffWarning.ps1",
+      "description": "Sends a toast/WTS warning message to all connected user sessions",
+      "category": "Maintenance",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": "Install-FSLogix",
+      "file": "Maintenance/Install-FSLogix.ps1",
+      "description": "Downloads and installs the latest FSLogix Apps with best-practice registry configuration, Defender exclusions, and version detection. Supports fresh install and upgrade.",
+      "category": "Maintenance",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 600
+    },
+    {
+      "name": "Re-register AVD Agent (Token)",
+      "file": "Registration-Fix/Re-register-AVD-Agent-Token.ps1",
+      "description": "Resets IsRegistered to 0, injects new pool token, deletes BootLoader key, restarts. Fixes transitioning/wrong pool/expired token. FleetCTRL passes token as first script argument.",
+      "category": "Registration Fix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 60
+    },
+    {
+      "name": "Move Host to Different Pool",
+      "file": "Registration-Fix/Move-Host-to-Different-Pool.ps1",
+      "description": "Moves a session host between pools without reimaging. Same as re-register but FleetCTRL passes the TARGET pool's token.",
+      "category": "Registration Fix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 60
+    },
+    {
+      "name": "Wipe Agent State and Re-register",
+      "file": "Registration-Fix/Wipe-Agent-State-and-Re-register.ps1",
+      "description": "Nuclear option: deletes BOTH registry hives entirely, recreates with clean state. Use when re-register fails due to corrupted hive.",
+      "category": "Registration Fix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 60
+    },
+    {
+      "name": "Logoff Disconnected Sessions",
+      "file": "Session-Management/Logoff-Disconnected-Sessions.ps1",
+      "description": "Force logoff all DISCONNECTED sessions only. Active sessions are never touched. Use before maintenance or agent repair.",
+      "category": "Session Management",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "Restart AVD Agent Services",
+      "file": "Soft-Fix/Restart-AVD-Agent-Services.ps1",
+      "description": "Force-restarts RdAgent and RDAgentBootLoader. Fixes 90% of random \"went unhealthy\" situations. Microsoft recommended first step.",
+      "category": "Soft Fix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 60
+    },
+    {
+      "name": "Set Agent Delayed Auto-Start",
+      "file": "Soft-Fix/Set-Agent-Delayed-Auto-Start.ps1",
+      "description": "Sets RDAgentBootLoader to Delayed Auto start. Prevents boot-race condition where agent loses to other services. MS documented fix for hosts unhealthy after every reboot.",
+      "category": "Soft Fix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    },
+    {
+      "name": "Reinstall SxS Network Stack",
+      "file": "Stack--SxS-Fix/Reinstall-SxS-Network-Stack.ps1",
+      "description": "Uninstalls and reinstalls the RDP side-by-side stack MSI. Fixes InstallationHealthCheckFailedException and missing rdp-sxs listener in qwinsta.",
+      "category": "Stack / SxS Fix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
+    },
+    {
+      "name": "Remove DisableRegistryTools Block",
+      "file": "Stack--SxS-Fix/Remove-DisableRegistryTools-Block.ps1",
+      "description": "Removes DisableRegistryTools GPO key that prevents agent from installing SxS stack. Fixes installMsiException errors.",
+      "category": "Stack / SxS Fix",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 30
+    }
+  ]
+}
