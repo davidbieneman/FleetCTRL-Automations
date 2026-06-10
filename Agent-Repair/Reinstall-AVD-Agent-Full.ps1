@@ -2,7 +2,7 @@
 # Complete uninstall and reinstall of AVD agent + bootloader. Requires reboot. Use when agent is corrupted or wrong version. FleetCTRL passes RegistrationToken as argument.
 #Category: Agent Repair
 #Run On: on_demand
-#Timeout: 300
+#Timeout: 600
 #Execution Mode: serial
 
 #Requires -RunAsAdministrator

@@ -2,7 +2,7 @@
 # Installs AVD agent from scratch on a VM with no agent. Requires reboot. Use diagnose_agent first to confirm agent is truly missing.
 #Category: Agent Repair
 #Run On: on_demand
-#Timeout: 300
+#Timeout: 600
 #Execution Mode: serial
 
 #Requires -RunAsAdministrator
