@@ -2,7 +2,7 @@
 # Updates Windows Defender antivirus signatures via MpCmdRun.exe
 #Category: Patching
 #Run On: on_demand
-#Timeout: 600
+#Timeout: 1800
 #Execution Mode: serial
 
 <#
