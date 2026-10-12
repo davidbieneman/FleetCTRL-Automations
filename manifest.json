@@ -424,6 +424,15 @@
       "run_on": "on_demand",
       "execution_mode": "serial",
       "timeout_seconds": 30
+    },
+    {
+      "name": "Repair Network and DNS",
+      "file": "Agent-Repair/Repair-Network-DNS.ps1",
+      "description": "Fixes a host that cannot resolve or reach the AVD service, typically after a VPN client left its DNS servers or default route behind. Changes nothing when AVD is already reachable.",
+      "category": "Agent Repair",
+      "run_on": "on_demand",
+      "execution_mode": "serial",
+      "timeout_seconds": 120
     }
   ]
 }
