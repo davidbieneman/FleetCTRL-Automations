@@ -255,15 +255,6 @@
       "timeout_seconds": 30
     },
     {
-      "name": "FSLogix: VHD Compact",
-      "file": "FSLogix-Profiles/FSLogix-VHD-Compact.ps1",
-      "description": "Compacts dynamic VHD/VHDX files to reclaim unused white space. Checks mount status before compacting. Requires Hyper-V PowerShell module. Reports space saved per container.",
-      "category": "FSLogix: Profiles",
-      "run_on": "on_demand",
-      "execution_mode": "serial",
-      "timeout_seconds": 600
-    },
-    {
       "name": "FSLogix: VHD Repair",
       "file": "FSLogix-Profiles/FSLogix-VHD-Repair.ps1",
       "description": "Scans and repairs corrupted VHD/VHDX file systems using Repair-Volume. Mounts read-only for scan, unmounts for offline repair if issues found. Requires Hyper-V module.",
